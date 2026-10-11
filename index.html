@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Buildify AI | Smart Construction Marketplace</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+:root{--bg:#060a14;--card:rgba(255,255,255,.045);--line:rgba(255,255,255,.1);--or:#ff6a1a;--or2:#ffb347;--cy:#38d6ff;--tx:#e9eef8;--mu:#8b96ab;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-behavior:smooth;scroll-padding-top:calc(80px + env(safe-area-inset-top,0px))}
+body{background:var(--bg);color:var(--tx);font-family:Inter,system-ui,sans-serif;overflow-x:hidden;margin:0}
+h1,h2,h3,.sg{font-family:'Space Grotesk',system-ui,sans-serif}
+#bg{position:fixed;inset:0;width:100%;height:100%;z-index:-1}
+body:before{content:"";position:fixed;inset:0;z-index:-1;background:radial-gradient(circle at 20% 10%,rgba(255,106,26,.14),transparent 45%),radial-gradient(circle at 90% 60%,rgba(56,214,255,.1),transparent 40%),linear-gradient(transparent 95%,rgba(255,255,255,.03) 95%),linear-gradient(90deg,transparent 95%,rgba(255,255,255,.03) 95%);background-size:auto,auto,48px 48px,48px 48px;pointer-events:none}
+#glow{position:fixed;width:420px;height:420px;border-radius:50%;pointer-events:none;z-index:0;background:radial-gradient(circle,rgba(255,106,26,.16),transparent 65%);transform:translate(-50%,-50%);left:-999px;top:-999px}
+.glass{background:var(--card);border:1px solid var(--line);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.grad{background:linear-gradient(100deg,var(--or),var(--or2) 55%,var(--cy));-webkit-background-clip:text;background-clip:text;color:transparent}
+.btn{background:linear-gradient(120deg,var(--or),#ff8f3a);color:#fff;font-weight:600;border-radius:14px;padding:.85rem 1.6rem;transition:.3s;position:relative;overflow:hidden;box-shadow:0 10px 30px -8px rgba(255,106,26,.6);border:0;cursor:pointer}
+.btn:hover{transform:translateY(-3px) scale(1.03);box-shadow:0 18px 40px -8px rgba(255,106,26,.85)}
+.btn:after{content:"";position:absolute;top:0;left:-120%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.45),transparent);transform:skewX(-20deg);transition:.6s}
+.btn:hover:after{left:140%}
+.ghost{border:1px solid var(--line);border-radius:14px;padding:.85rem 1.6rem;font-weight:600;transition:.3s;background:var(--card);cursor:pointer;color:var(--tx)}
+.ghost:hover{border-color:var(--or);color:var(--or2);transform:translateY(-3px)}
+.tilt{transform-style:preserve-3d;transition:transform .2s ease-out,border-color .3s,box-shadow .3s;position:relative;will-change:transform}
+.tilt:before{content:"";position:absolute;inset:0;border-radius:inherit;background:radial-gradient(260px circle at var(--mx,50%) var(--my,50%),rgba(255,106,26,.22),transparent 60%);opacity:0;transition:.3s;pointer-events:none}
+.tilt:hover{border-color:rgba(255,106,26,.6);box-shadow:0 30px 60px -20px rgba(255,106,26,.35)}
+.tilt:hover:before{opacity:1}
+.pop{transform:translateZ(40px)}
+.rv{opacity:0;transform:translateY(34px);transition:opacity .9s,transform .9s}
+.rv.in{opacity:1;transform:none}
+.fl{animation:fl 5s ease-in-out infinite}
+@keyframes fl{50%{transform:translateY(-14px) rotate(2deg)}}
+.mq{display:flex;gap:3rem;width:max-content;animation:mq 30s linear infinite}
+@keyframes mq{to{transform:translateX(-50%)}}
+.pill{border:1px solid var(--line);border-radius:999px;padding:.5rem 1.1rem;font-size:.85rem;font-weight:600;background:var(--card);cursor:pointer;transition:.25s;color:var(--mu)}
+.pill:hover,.pill.on{background:var(--or);border-color:var(--or);color:#fff;transform:translateY(-2px) scale(1.05)}
+.inp{width:100%;background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:12px;padding:.85rem 1rem;color:var(--tx);outline:0;transition:.25s;font-size:.95rem}
+.inp:focus{border-color:var(--or);box-shadow:0 0 0 3px rgba(255,106,26,.2)}
+.inp option{background:#101728}
+.mask{position:fixed;inset:0;z-index:150;background:rgba(3,6,12,.8);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:1rem}
+.mask.on{display:flex}
+.box{background:#0d1424;border:1px solid var(--line);border-radius:28px;max-width:560px;width:100%;max-height:90vh;overflow-y:auto;animation:pin .4s cubic-bezier(.2,1.2,.4,1)}
+@keyframes pin{from{opacity:0;transform:scale(.9) translateY(30px)}}
+.bar{height:8px;border-radius:9px;background:rgba(255,255,255,.08);overflow:hidden}
+.bar i{display:block;height:100%;border-radius:9px;background:linear-gradient(90deg,var(--or),var(--cy));width:0;transition:width 1.6s cubic-bezier(.2,.8,.2,1)}
+#chat{position:fixed;right:max(16px,env(safe-area-inset-right,0px));bottom:max(16px,env(safe-area-inset-bottom,0px));z-index:140}
+#cp{display:none;width:min(380px,calc(100vw - 32px));height:520px;max-height:70vh;flex-direction:column;border-radius:24px;overflow:hidden;margin-bottom:12px;background:#0d1424;border:1px solid var(--line);box-shadow:0 30px 80px rgba(0,0,0,.6);animation:pin .35s}
+#cp.on{display:flex}
+.bot{width:64px;height:64px;border-radius:20px;background:linear-gradient(145deg,var(--or),#ff8f3a);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;margin-left:auto;box-shadow:0 10px 35px rgba(255,106,26,.6);transition:.3s;position:relative}
+.bot:hover{transform:scale(1.12) rotate(-6deg)}
+.bot:before{content:"";position:absolute;inset:-5px;border-radius:24px;border:2px solid rgba(255,106,26,.5);animation:rp 2s infinite}
+@keyframes rp{to{inset:-16px;opacity:0}}
+.eye{width:9px;height:9px;background:#fff;border-radius:50%;display:inline-block;margin:0 3px;animation:bl 3s infinite}
+@keyframes bl{94%,100%{transform:scaleY(1)}97%{transform:scaleY(.1)}}
+.m{padding:.65rem .9rem;border-radius:16px;font-size:.85rem;line-height:1.5;max-width:86%}
+.m.a{background:rgba(255,106,26,.13);border:1px solid rgba(255,106,26,.25);align-self:flex-start}
+.m.u{background:#1c2740;align-self:flex-end}
+#toast{position:fixed;top:calc(16px + env(safe-area-inset-top,0px));right:16px;z-index:300;padding:.9rem 1.3rem;border-radius:14px;font-weight:600;transform:translateX(130%);transition:.4s;background:#16a34a}
+#toast.on{transform:none}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.rv{opacity:1;transform:none}}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.4/dist/umd/supabase.js"></script>
+</head>
+<body>
+<canvas id="bg"></canvas><div id="glow"></div>
+<div id="toast"></div>
+
+<nav class="sticky z-50 mx-3 mt-3 glass rounded-2xl px-5 py-3 flex items-center justify-between" style="top:calc(12px + env(safe-area-inset-top,0px))">
+  <a href="#home" class="sg font-bold text-xl flex items-center gap-2"><span class="w-9 h-9 rounded-xl grid place-items-center" style="background:linear-gradient(135deg,var(--or),var(--or2))">🏗️</span>Build<span style="color:var(--or)">ify</span> AI</a>
+  <div class="hidden md:flex gap-8 text-sm font-semibold" style="color:var(--mu)">
+    <a class="hover:text-white transition" href="#features">Features</a><a class="hover:text-white transition" href="#estimator">AI estimator</a><a class="hover:text-white transition" href="#workers">Workers</a><a class="hover:text-white transition" href="#proof">Reviews</a>
+  </div>
+  <div class="flex items-center gap-2"><button class="ghost" style="padding:.5rem .8rem" id="lb" onclick="tl()">हिं</button><div id="navAuth"></div></div>
+</nav>
+
+<header id="home" class="max-w-7xl mx-auto px-5 pt-16 pb-20 grid lg:grid-cols-2 gap-12 items-center relative z-10">
+  <div class="rv">
+    <span class="glass rounded-full px-4 py-2 text-sm font-semibold inline-flex items-center gap-2 mb-6"><span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>Live in Jaipur · 450+ active sites</span>
+    <h1 class="text-5xl md:text-7xl font-bold leading-[1.02] tracking-tight mb-6">Hire verified builders. <span class="grad">Know the cost</span> before day one.</h1>
+    <p class="text-lg mb-9 max-w-lg" style="color:var(--mu)">Masons, electricians, plumbers and architects across Jaipur, matched by AI, paid through escrow, and reviewed by real customers.</p>
+    <div class="flex flex-wrap gap-4"><a href="#workers" class="btn">Find a worker</a><a href="#estimator" class="ghost">Try the AI estimator</a></div>
+    <div class="grid grid-cols-3 gap-4 mt-12 max-w-md">
+      <div><div class="sg text-3xl font-bold" data-c="12000" data-s="+">0</div><div class="text-xs" style="color:var(--mu)">Verified artisans</div></div>
+      <div><div class="sg text-3xl font-bold" data-c="450" data-s="+">0</div><div class="text-xs" style="color:var(--mu)">Sites delivered</div></div>
+      <div><div class="sg text-3xl font-bold" data-c="49" data-s="/5" data-d="1">0</div><div class="text-xs" style="color:var(--mu)">Average rating</div></div>
+    </div>
+  </div>
+  <div class="relative h-[460px] rv" style="perspective:1200px">
+    <div class="tilt glass rounded-3xl p-6 absolute top-4 left-0 w-[85%] fl" data-t="8">
+      <div class="flex items-center justify-between mb-4"><b class="sg">🤖 Structural AI scan</b><span class="text-xs px-2 py-1 rounded-full bg-green-500/20 text-green-300">Passed</span></div>
+      <div class="space-y-4 text-sm" style="color:var(--mu)">
+        <div>Foundation load<div class="bar mt-1"><i data-w="92"></i></div></div>
+        <div>Wiring safety<div class="bar mt-1"><i data-w="78"></i></div></div>
+        <div>Material efficiency<div class="bar mt-1"><i data-w="85"></i></div></div>
+      </div>
+    </div>
+    <div class="tilt glass rounded-3xl p-5 absolute bottom-6 right-0 w-[68%] fl" style="animation-delay:-2s" data-t="10">
+      <div class="flex items-center gap-3"><div class="w-12 h-12 rounded-2xl grid place-items-center text-2xl" style="background:rgba(255,106,26,.2)">🔒</div><div><b class="sg">Escrow protected</b><div class="text-xs" style="color:var(--mu)">₹24,000 released on completion</div></div></div>
+    </div>
+  </div>
+</header>
+
+<div class="overflow-hidden py-5 border-y relative z-10" style="border-color:var(--line);background:rgba(255,255,255,.02)">
+  <div class="mq sg text-xl font-bold" style="color:var(--mu)" id="mq"></div>
+</div>
+
+<section id="features" class="max-w-7xl mx-auto px-5 py-24 relative z-10">
+  <h2 class="text-4xl md:text-5xl font-bold mb-3 rv">Everything a site needs, <span class="grad">in one place</span></h2>
+  <p class="mb-12 rv" style="color:var(--mu)">Hover a card — each one reacts to you.</p>
+  <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6" style="perspective:1200px" id="feat"></div>
+</section>
+
+<section id="estimator" class="max-w-6xl mx-auto px-5 py-16 relative z-10">
+  <div class="tilt glass rounded-[2rem] p-8 md:p-12 grid md:grid-cols-2 gap-10 rv" data-t="3">
+    <div>
+      <h2 class="text-4xl font-bold mb-3">AI cost <span class="grad">estimator</span></h2>
+      <p class="mb-8" style="color:var(--mu)">Pick the job and the area. Get a Jaipur-market estimate and the right worker in seconds.</p>
+      <label class="text-sm font-semibold">Type of work</label>
+      <select id="et" class="inp mt-1 mb-6" oninput="est()"><option value="Painter|18|350">Interior painting</option><option value="Mason|95|60">Masonry &amp; plastering</option><option value="Electrician|60|120">House wiring</option><option value="Plumber|70|110">Plumbing &amp; bathroom</option><option value="Carpenter|150|80">Modular woodwork</option></select>
+      <label class="text-sm font-semibold">Area: <span id="ev" class="text-orange-400">1000</span> sq ft</label>
+      <input id="ea" type="range" min="100" max="5000" step="50" value="1000" class="w-full mt-2" style="accent-color:var(--or)" oninput="est()">
+    </div>
+    <div class="rounded-2xl p-6 flex flex-col justify-center" style="background:rgba(0,0,0,.35);border:1px solid var(--line)" id="eo"></div>
+  </div>
+</section>
+
+<section id="match" class="max-w-4xl mx-auto px-5 py-16 relative z-10"><div class="glass rounded-[2rem] p-8 rv"><h2 class="text-3xl font-bold mb-2">Describe your job</h2><p class="mb-5 text-sm" style="color:var(--mu)">Write in English or Hindi. Example: bathroom pipe is leaking, need someone tomorrow.</p><div class="flex gap-2"><input id="jb" class="inp" placeholder="What needs fixing or building?" onkeydown="if(event.key==='Enter')mt()"><button class="btn" onclick="mt()">Find my worker</button></div><div id="mo" class="mt-5 space-y-3"></div></div></section>
+<section id="workers" class="max-w-7xl mx-auto px-5 py-24 relative z-10">
+  <h2 class="text-4xl md:text-5xl font-bold mb-3 rv">Verified workforce in <span class="grad">Jaipur</span></h2>
+  <p class="mb-8 rv" style="color:var(--mu)">Biometric and background checked. Open any card for reviews and booking.</p>
+  <div class="flex flex-wrap gap-3 mb-8 items-center rv">
+    <div id="pills" class="flex flex-wrap gap-2"></div>
+    <input id="q" class="inp md:ml-auto md:max-w-xs" placeholder="Search name or skill…" oninput="draw()">
+  </div>
+  <div class="flex flex-wrap gap-3 mb-6 items-center"><select id="fa" class="inp" style="width:auto" oninput="draw()"><option value="All">All areas</option><option>Malviya Nagar</option><option>Mansarovar</option><option>Jagatpura</option><option>Vaishali Nagar</option><option>Tonk Road</option><option>C-Scheme</option><option>Sanganer</option><option>Pratap Nagar</option></select><select id="fp" class="inp" style="width:auto" oninput="draw()"><option value="0">Any price</option><option value="900">Up to ₹900</option><option value="1200">Up to ₹1,200</option><option value="3500">Up to ₹3,500</option></select><select id="fs" class="inp" style="width:auto" oninput="draw()"><option value="">Sort: default</option><option value="r">Top rated</option><option value="p">Lowest price</option></select><label class="pill flex items-center gap-2"><input id="fv" type="checkbox" oninput="draw()" style="accent-color:var(--or)">Available now</label></div>
+<div id="grid" class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6" style="perspective:1200px"></div>
+<div id="cb" class="fixed glass rounded-2xl px-5 py-3 items-center gap-4" style="display:none;z-index:130;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px))"><span id="cn"></span><button class="btn" style="padding:.5rem 1.2rem" onclick="showCmp()">Compare</button><button onclick="CMP=[];cmpUi();draw()">✕</button></div>
+</section>
+
+<section id="proof" class="max-w-7xl mx-auto px-5 py-16 relative z-10">
+  <h2 class="text-4xl font-bold mb-10 rv">People who built with Buildify</h2>
+  <div class="grid md:grid-cols-3 gap-6" style="perspective:1200px">
+    <div class="tilt glass rounded-3xl p-7 rv" data-t="10"><div class="text-orange-400 mb-3">★★★★★</div><p class="mb-5">Our 3BHK wiring was finished two days early and the escrow meant I only paid once I was happy.</p><b class="sg">Mohit Singh</b><div class="text-xs" style="color:var(--mu)">Vaishali Nagar</div></div>
+    <div class="tilt glass rounded-3xl p-7 rv" data-t="10"><div class="text-orange-400 mb-3">★★★★★</div><p class="mb-5">The estimator was within 6% of the final bill. First time a contractor quote felt honest.</p><b class="sg">Anita Sharma</b><div class="text-xs" style="color:var(--mu)">Mansarovar</div></div>
+    <div class="tilt glass rounded-3xl p-7 rv" data-t="10"><div class="text-orange-400 mb-3">★★★★★</div><p class="mb-5">As a plumber I now get steady bookings and my rate is shown upfront. No more bargaining.</p><b class="sg">Rahul Singh</b><div class="text-xs" style="color:var(--mu)">Plumber, Jagatpura</div></div>
+  </div>
+</section>
+
+<footer class="max-w-7xl mx-auto px-5 py-16 relative z-10">
+  <div class="glass rounded-[2rem] p-10 flex flex-wrap items-center justify-between gap-6">
+    <div><h3 class="text-3xl font-bold mb-1">Ready to start your site?</h3><p style="color:var(--mu)">hq@buildifyai.com · Jagatpura, Jaipur</p></div>
+    <a href="#workers" class="btn">Hire a pro today</a>
+  </div>
+  <p class="text-center text-xs mt-8" style="color:var(--mu)">© 2026 Buildify AI. Estimates are indicative.</p>
+</footer>
+
+<div id="chat">
+  <div id="cp">
+    <div class="p-4 flex items-center gap-3" style="background:linear-gradient(120deg,rgba(255,106,26,.25),transparent);border-bottom:1px solid var(--line)"><b class="sg flex-1">BuildBot AI</b><button onclick="tc()" class="text-xl">✕</button></div>
+    <div id="cw" class="flex-1 overflow-y-auto p-4 flex flex-col gap-3"></div>
+    <div class="px-3 pb-2 flex gap-2 overflow-x-auto" id="qr"></div>
+    <div class="p-3 flex gap-2" style="border-top:1px solid var(--line)"><input id="ci" class="inp" placeholder="Ask about rates, booking…" onkeydown="if(event.key==='Enter')ask()"><button class="ghost" style="padding:.6rem .8rem" onclick="mic()" title="Speak">🎤</button><button class="btn" style="padding:.6rem 1rem" onclick="ask()">Send</button></div>
+  </div>
+  <div class="bot" onclick="tc()"><div><span class="eye"></span><span class="eye"></span></div><div style="width:20px;height:6px;border:2px solid #fff;border-top:0;border-radius:0 0 10px 10px;margin-top:5px"></div></div>
+</div>
+
+<div id="mk" class="mask" onclick="if(event.target===this)cm()"><div class="box" id="mb"></div></div>
+
+<script>
+const PH='0000000000',ST=['Confirmed','On the way','Working','Completed','Payment released'];
+const AR=['Malviya Nagar','Mansarovar','Jagatpura','Vaishali Nagar','Tonk Road','C-Scheme','Sanganer','Pratap Nagar'];
+const SKN=[0,'#c68642','#8d5524','#a9714b','#8d5524','#c68642','#e0ac69','#8d5524','#a9714b'];
+const HD={Mason:['hat','#ffc800'],Electrician:['hat','#ff6a1a'],Plumber:['cap','#2563eb'],Carpenter:['pag','#d9232d'],Painter:['gam','#f1f5f9'],Welder:['hat','#ffc800'],'AC Tech':['cap','#0ea5e9']};
+const TL={Mason:'🧱',Electrician:'⚡',Plumber:'🔧',Carpenter:'🪚',Painter:'🎨',Architect:'📐',Welder:'🔥','AC Tech':'❄️'};
+function av(w,z){const k=SKN[w[0]],c=col[w[2]],f=w[2]==='Architect',[h,hc]=HD[w[2]]||[];
+let s=`<svg width="${z}" height="${z}" viewBox="0 0 120 120" aria-label="${w[2]}">`;
+if(f)s+=`<path d="M32 54a28 30 0 0156 0v36H32z" fill="#1a0f0a"/>`;
+s+=`<path d="M14 120c0-30 20-42 46-42s46 12 46 42z" fill="${f?'#e0457b':c}"/><path d="M47 78l13 15 13-15z" fill="#fff" opacity=".85"/>${f?'<path d="M20 120c4-22 14-34 30-38l-6 38z" fill="#f59e0b" opacity=".85"/>':''}<rect x="52" y="64" width="16" height="16" fill="${k}"/><circle cx="39" cy="52" r="4.5" fill="${k}"/><circle cx="81" cy="52" r="4.5" fill="${k}"/><ellipse cx="60" cy="50" rx="21" ry="24" fill="${k}"/><circle cx="52" cy="50" r="2.4" fill="#1a1a1a"/><circle cx="68" cy="50" r="2.4" fill="#1a1a1a"/><path d="M54 67q6 4 12 0" stroke="#3b1d12" stroke-width="2" fill="none"/>`;
+s+=f?`<circle cx="60" cy="38" r="2.6" fill="#e11d48"/><circle cx="39" cy="60" r="2.5" fill="#fbbf24"/><circle cx="81" cy="60" r="2.5" fill="#fbbf24"/><path d="M38 46q22-22 44 0q-22-8-44 0z" fill="#1a0f0a"/>`:`<path d="M47 61q13-7 26 0q-13 4-26 0z" fill="#1a1a1a"/>`;
+if(h==='hat')s+=`<path d="M36 43a24 22 0 0148 0z" fill="${hc}"/><rect x="32" y="41" width="56" height="6" rx="3" fill="${hc}"/><rect x="55" y="22" width="10" height="18" rx="3" fill="${hc}"/>`;
+if(h==='cap')s+=`<path d="M38 43a22 20 0 0144 0z" fill="${hc}"/><path d="M34 43h56l-3 6H34z" fill="${hc}" opacity=".8"/>`;
+if(h==='pag')s+=`<ellipse cx="60" cy="33" rx="27" ry="15" fill="${hc}"/><path d="M34 36q26-12 52 0M38 28q22-10 44 0" stroke="#f5c242" stroke-width="3" fill="none"/><path d="M86 38q8 10 2 24" stroke="${hc}" stroke-width="6" fill="none"/>`;
+if(h==='gam')s+=`<path d="M38 45a22 22 0 0144 0q-22-9-44 0z" fill="${hc}"/><path d="M38 45l-7 22 9-7z" fill="${hc}"/>`;
+return s+`<circle cx="98" cy="98" r="17" fill="#0d1424" stroke="${c}" stroke-width="3"/><text x="98" y="105" font-size="19" text-anchor="middle">${TL[w[2]]}</text></svg>`}
+let LG='en';
+const HI={'Features':'सुविधाएँ','AI estimator':'AI अनुमान','Workers':'कारीगर','Reviews':'समीक्षाएँ','Login / Join':'लॉगिन / जुड़ें','Find a worker':'कारीगर खोजें','Try the AI estimator':'AI अनुमान आज़माएँ','Hire verified builders.':'सत्यापित कारीगर बुक करें।','Know the cost':'लागत जानें','before day one.':'काम शुरू होने से पहले।','Verified artisans':'सत्यापित कारीगर','Sites delivered':'पूरे हुए साइट','Average rating':'औसत रेटिंग','Hire now':'अभी बुक करें','Currently busy':'अभी व्यस्त','Available':'उपलब्ध','On Site':'काम पर','Confirm booking':'बुकिंग पक्की करें','Total estimate':'कुल अनुमान','Type of work':'काम का प्रकार','AI estimate':'AI अनुमान','Describe your job':'अपना काम बताएँ','Find my worker':'मेरा कारीगर खोजें','+ Compare':'+ तुलना','✓ Added':'✓ जोड़ा','Compare':'तुलना करें','Send OTP':'OTP भेजें','Verify and continue':'OTP जाँचें','All areas':'सभी इलाके','Any price':'कोई भी दाम','Available now':'अभी उपलब्ध','Ready to start your site?':'अपना काम शुरू करने को तैयार?','Hire a pro today':'आज ही कारीगर बुक करें','Verified workforce in':'सत्यापित कारीगर —','Jaipur':'जयपुर','AI cost':'AI लागत','estimator':'अनुमान','Describe your job':'अपना काम बताएँ','Search name or skill…':'नाम या काम खोजें…','What needs fixing or building?':'क्या ठीक या बनवाना है?','Full name':'पूरा नाम','10-digit mobile number':'10 अंकों का मोबाइल नंबर','Welcome back':'वापसी पर स्वागत','Create your ID':'अपनी ID बनाएँ','Confirm booking':'बुकिंग पक्की करें'};
+function tr(){const hi=LG==='hi',w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);let n;while(n=w.nextNode()){if(n._o===undefined)n._o=n.nodeValue;const t=n._o.trim(),v=hi&&HI[t]?n._o.replace(t,HI[t]):n._o;if(n.nodeValue!==v)n.nodeValue=v}
+document.querySelectorAll('[placeholder]').forEach(e=>{e._p=e._p||e.placeholder;e.placeholder=hi&&HI[e._p]?HI[e._p]:e._p});const b=document.getElementById('lb');if(b)b.textContent=hi?'EN':'हिं'}
+function tl(){LG=LG==='hi'?'en':'hi';S.set('lang',LG);tr()}
+</script>
+<script>
+// ====== MAIN (original) ======
+const mem={},S={get(k){try{return localStorage.getItem(k)}catch(e){return mem[k]||null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){mem[k]=v}}};
+// ====== SUPABASE SETTINGS ======
+const SUPABASE_URL='https://iqozzhufcvasgieybtjj.supabase.co';
+const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlxb3p6aHVmY3Zhc2dpZXlidGpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE2Mjk1MDEsImV4cCI6MjEwNzIwNTUwMX0.-lDuLtYU50nU6ub86xbx26YTIhdojYTw0a2PZ11dz4A';
+// ================================
+const sb=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+let U=null;
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt=n=>'₹'+Math.round(n).toLocaleString('en-IN');
+const W=[
+[1,'Suresh Sharma','Mason',4.9,8,142,'Available',1200,'🧱','RCC, brick laying, plastering and tile work on 50+ Jaipur homes.',['RCC','Plastering','Tiles','Waterproofing']],
+[2,'Amit Verma','Electrician',4.7,5,98,'On Site',900,'⚡','Licensed electrician for house wiring, panels, inverters and smart homes.',['Wiring','Panels','Inverters','CCTV']],
+[3,'Rahul Singh','Plumber',4.8,10,215,'Available',850,'🔧','Water supply, drainage and full bathroom fitting for homes and offices.',['Drainage','Bathroom fit','Pipe repair','Pumps']],
+[4,'Vikram Jeet','Carpenter',4.6,12,180,'Available',1100,'🪚','Custom furniture, modular kitchens, false ceilings and wooden floors.',['Furniture','Kitchens','Ceilings','Flooring']],
+[5,'Karan Mehra','Painter',4.5,7,165,'Available',700,'🎨','Interior and exterior painting, texture work and waterproof coats.',['Interior','Exterior','Texture','Waterproof']],
+[6,'Priya Das','Architect',5.0,4,32,'Available',3500,'🏛️','Vastu-compliant residential design, 3D visualisation and site supervision.',['Design','3D views','Vastu','Supervision']],
+[7,'Sunil Kumar','Welder',4.7,9,128,'On Site',1000,'🔥','Structural steel, gates, grills, staircases and MS fabrication.',['Steel','Gates','Staircase','TIG']],
+[8,'Deepak Raj','AC Tech',4.8,6,310,'Available',800,'❄️','Installation, servicing and gas refill for every brand, plus VRF systems.',['Install','Gas refill','Service','VRF']]];
+const RV=[['Rahul Gupta',5,'Clean work, on time, and no wastage on site.'],['Anita Sharma',5,'Very professional. I would hire again without thinking.'],['Vijay Patel',4,'Good work overall and finished on schedule.']];
+const col={Mason:'#ff6a1a',Electrician:'#ffd23f',Plumber:'#38d6ff',Carpenter:'#c98a4b',Painter:'#e056fd',Architect:'#6ee7b7',Welder:'#ff5d5d','AC Tech':'#7aa2ff'};
+
+function toast(m,ok=true){const t=document.getElementById('toast');t.textContent=m;t.style.background=ok?'#16a34a':'#dc2626';t.classList.add('on');setTimeout(()=>t.classList.remove('on'),2800)}
+function om(h){document.getElementById('mb').innerHTML=h;document.getElementById('mk').classList.add('on')}
+function cm(){document.getElementById('mk').classList.remove('on')}
+
+// ---- nav / auth
+function nav(){const n=document.getElementById('navAuth');n.innerHTML=U?`<div class="flex items-center gap-2"><button class="ghost" style="padding:.5rem 1rem" onclick="dash()">👤 ${esc(U.name.split(' ')[0])} <span class="text-xs text-orange-400">${esc(U.role)}</span></button><button class="ghost" style="padding:.5rem .8rem" onclick="logout()">⎋</button></div>`:`<button class="btn" style="padding:.6rem 1.2rem" onclick="auth('login')">Login / Join</button>`}
+function dash(){const b=U.bookings||[];om(`<div class="p-8"><div class="flex items-center gap-4 mb-6"><div class="w-16 h-16 rounded-full grid place-items-center text-2xl font-bold" style="background:linear-gradient(135deg,var(--or),var(--or2))">${esc(U.name[0].toUpperCase())}</div><div><h3 class="text-2xl font-bold">${esc(U.name)}</h3><p class="text-orange-400 text-sm">${esc(U.role)}</p></div><button class="ml-auto text-xl" onclick="cm()">✕</button></div>
+${U.role!=='Customer'?`<div class="glass rounded-2xl p-4 flex items-center justify-between mb-5"><div><b>Availability</b><div class="text-xs" style="color:var(--mu)">Customers see this on your card</div></div><button class="pill ${U.avail?'on':''}" onclick="setAvail()">${U.avail?'Available ✓':'Unavailable'}</button></div>`:''}
+${U.role!=='Customer'?`<div class="glass rounded-2xl p-4 mb-5 text-sm space-y-1"><div><b>${esc(U.skill||'')}</b> · ${U.experience_years??0} yrs · ${fmt(U.rate||0)}/day</div><div style="color:var(--mu)">${esc(U.area||'')}${U.company?' · '+esc(U.company):''}${U.team_size?' · team of '+U.team_size:''}</div>${U.skills?`<div>Skills: ${esc(U.skills)}</div>`:''}${U.bio?`<div style="color:var(--mu)">${esc(U.bio)}</div>`:''}</div>`:''}
+<h4 class="font-bold mb-3">Bookings (${b.length})</h4><div class="space-y-3">${b.length?b.map(x=>`<div class="glass rounded-2xl p-4"><div class="flex justify-between"><b>${esc(x.w)} · ${esc(x.s)}</b><span class="text-green-400 text-xs">${ST[x.st||0]}</span></div><div class="text-xs mt-1" style="color:var(--mu)">${x.d} · ${x.n} day(s) · ${esc(x.a)}</div><div class="text-orange-400 font-bold mt-2">${fmt(x.t)} <span class="text-xs" style="color:var(--mu)">${x.id}</span></div><div class="flex gap-1 mt-3">${ST.map((q,i)=>`<i class="flex-1 h-1.5 rounded" style="background:${i<=(x.st||0)?'var(--or)':'rgba(255,255,255,.12)'}"></i>`).join('')}</div>${U.role==='Customer'&&(x.st||0)<4?`<button class="pill mt-3" onclick="stp('${x.id}')">${(x.st||0)===3?'Release payment':'Update: '+ST[(x.st||0)+1]}</button>`:''}</div>`).join(''):'<p style="color:var(--mu)" class="text-sm">No bookings yet. Pick a worker below to get started.</p>'}</div></div>`)}
+
+// ---- workers
+function draw(){const f=window.F||'All',q=(document.getElementById('q')||{value:''}).value.toLowerCase();
+const L=W.filter(w=>(f==='All'||w[2]===f)&&(w[1]+w[2]+w[10].join()).toLowerCase().includes(q));
+document.getElementById('grid').innerHTML=L.length?L.map(w=>{const ok=w[6]==='Available',c=col[w[2]];return `<div class="tilt glass rounded-3xl overflow-hidden cursor-pointer" data-t="12" onclick="prof(${w[0]})">
+<div class="h-40 grid place-items-center relative" style="background:radial-gradient(circle at 50% 120%,${c}55,transparent 70%)"><div class="text-6xl pop fl">${w[8]}</div>
+<span class="absolute top-3 left-3 text-xs font-semibold px-3 py-1 rounded-full ${ok?'bg-green-500/20 text-green-300':'bg-red-500/20 text-red-300'}">${w[6]}</span><span class="absolute top-3 right-3 text-xs font-semibold px-3 py-1 rounded-full glass">${fmt(w[7])}/day</span></div>
+<div class="p-5"><div class="flex justify-between items-center"><h3 class="font-bold text-lg">${w[1]}</h3><span class="text-orange-400 text-sm font-bold">★ ${w[3]}</span></div>
+<p class="text-sm mb-2" style="color:${c}">${w[2]} · ${w[4]} yrs</p><p class="text-xs mb-4 line-clamp-2" style="color:var(--mu)">${w[9]}</p>
+<button class="btn w-full" style="padding:.6rem" ${ok?'':'disabled'} onclick="event.stopPropagation();prof(${w[0]})">${ok?'Hire now':'Currently busy'}</button></div></div>`}).join(''):'<p style="color:var(--mu)">No worker matches. Try another skill.</p>';tiltInit()}
+function pills(){const sk=['All',...new Set(W.map(w=>w[2]))];document.getElementById('pills').innerHTML=sk.map(s=>`<button class="pill ${s==='All'?'on':''}" onclick="window.F='${s}';document.querySelectorAll('#pills .pill').forEach(p=>p.classList.toggle('on',p.textContent==='${s}'));draw()">${s}</button>`).join('')}
+let CW=null;
+function prof(id){const w=W.find(x=>x[0]===id);CW=w;const c=col[w[2]];
+om(`<div class="relative h-44 grid place-items-center rounded-t-[28px]" style="background:radial-gradient(circle at 50% 130%,${c}66,transparent 70%)"><div class="fl">${av(w,150)}</div><button class="absolute top-4 right-4 text-xl" onclick="cm()">✕</button></div>
+<div class="p-7"><h3 class="text-3xl font-bold">${w[1]}</h3><p class="mb-5" style="color:${c}">${w[2]} · ${w[4]} yrs · ${w[5]}+ jobs · ★ ${w[3]}</p><p class="text-sm mb-4" style="color:var(--mu)">${w[9]}</p>
+<div class="flex flex-wrap gap-2 mb-6">${w[10].map(t=>`<span class="pill" style="cursor:default">${t}</span>`).join('')}</div>
+<div class="glass rounded-xl p-3 text-sm mb-4">✔ Verified: ID, phone number and background check completed</div><div class="grid grid-cols-2 gap-3 mb-6"><a class="btn text-center" target="_blank" rel="noopener" href="https://wa.me/91${PH}?text=${encodeURIComponent('Hi '+w[1]+', I found you on Buildify AI and need a '+w[2]+'.')}">WhatsApp</a><a class="ghost text-center" href="tel:+91${PH}">Call</a></div><h4 class="font-bold mb-2">Reviews</h4><div class="space-y-2 mb-6">${RV.slice(0,2).map(r=>`<div class="glass rounded-xl p-3 text-sm"><b>${r[0]}</b> <span class="text-orange-400">${'★'.repeat(r[1])}</span><div style="color:var(--mu)">${r[2]}</div></div>`).join('')}</div>
+<h4 class="font-bold mb-2">Book ${w[1].split(' ')[0]}</h4><div class="space-y-3"><div class="grid grid-cols-2 gap-3"><input id="bd" type="date" class="inp" min="${new Date().toISOString().slice(0,10)}"><select id="bn" class="inp" oninput="bt()"><option value="1">1 day</option><option value="3">3 days</option><option value="7">1 week</option><option value="14">2 weeks</option><option value="30">1 month</option></select></div>
+<input id="ba" class="inp" placeholder="Site address in Jaipur"><div class="flex justify-between items-center"><span style="color:var(--mu)">Total estimate</span><b id="btt" class="text-2xl text-orange-400">${fmt(w[7])}</b></div>
+<p class="text-xs" style="color:var(--mu)">Example policy: free cancellation up to 12 hours before the slot. Payment stays in escrow until you release it.</p><button class="btn w-full" onclick="book()">Confirm booking</button></div></div>`)}
+function bt(){document.getElementById('btt').textContent=fmt(CW[7]*+document.getElementById('bn').value)}
+async function book(){if(!U){cm();return auth('login')}if(U.role!=='Customer')return toast('Login as a Customer to book',false);
+const d=bd.value,a=ba.value.trim();if(!d||!a)return toast('Add a date and site address',false);const n=+bn.value,id='BLD'+Date.now().toString().slice(-6),t=CW[7]*n;
+const {error}=await sb.from('bookings').insert({booking_code:id,customer_id:U.id,worker_name:CW[1],skill:CW[2],booking_date:d,days:n,address:a,total:t,status:0});
+if(error)return toast(error.message,false);
+U.bookings.unshift({id,w:CW[1],s:CW[2],d,n,a,t,st:0});cm();toast('Booked! ID '+id)}
+
+// ---- estimator
+function est(){const [sk,r,p]=et.value.split('|'),a=+ea.value;ev.textContent=a;const cost=a*+r,days=Math.max(1,Math.ceil(a/+p)),w=W.find(x=>x[2]===sk);
+eo.innerHTML=`<div class="text-sm" style="color:var(--mu)">AI estimate</div><div class="sg text-5xl font-bold grad my-2">${fmt(cost*.9)} – ${fmt(cost*1.1)}</div><div class="grid grid-cols-2 gap-3 my-4 text-sm"><div class="glass rounded-xl p-3">⏱ ${days} working day${days>1?'s':''}</div><div class="glass rounded-xl p-3">👷 Crew of ${Math.min(5,Math.ceil(days/6))||1}</div></div>
+<div class="glass rounded-xl p-3 text-sm flex items-center gap-3 mb-4"><span>${av(w,48)}</span><div><b>Best match: ${w[1]}</b><div style="color:var(--mu)">★ ${w[3]} · ${fmt(w[7])}/day</div></div></div><button class="btn" onclick="prof(${w[0]})">View ${w[1].split(' ')[0]}'s profile</button>`}
+
+// ---- chatbot
+const QA=[[['account','signup','register','join'],'Tap <b>Login / Join</b>, choose <b>Create ID</b>, pick Customer, Worker or Contractor and fill your details. It takes about 30 seconds.'],
+[['book','hire'],'Login as a <b>Customer</b>, open any worker card, choose a date, duration and site address, then tap <b>Confirm booking</b>. You get a booking ID instantly.'],
+[['rate','price','cost','charge'],()=>'Daily rates:<br>'+W.map(w=>`${w[8]} ${w[2]} ${fmt(w[7])}`).join('<br>')+'<br>Try the AI estimator for a full-job quote.'],
+[['escrow','pay','safe'],'Your payment is held in escrow and released to the worker only after you confirm the job is done.'],
+[['area','where','jaipur','location'],'We cover Malviya Nagar, Mansarovar, Jagatpura, Vaishali Nagar, Tonk Road, C-Scheme and more. Most workers reach you in 2 to 4 hours.'],
+[['hi','hello','namaste','hey'],'Namaste! 🙏 Ask me about rates, booking, or tell me which trade you need.']];
+function reply(m){m=m.toLowerCase();const w=W.find(x=>m.includes(x[2].toLowerCase())||x[10].some(t=>m.includes(t.toLowerCase())));
+if(w)return `${w[8]} <b>${w[1]}</b> (${w[2]}) · ★ ${w[3]} · ${fmt(w[7])}/day · ${w[6]}.<br><a class="text-orange-400 cursor-pointer" onclick="prof(${w[0]})">Open profile</a>`;
+for(const [k,r] of QA)if(k.some(x=>m.includes(x)))return typeof r==='function'?r():r;return 'I can help with <b>rates</b>, <b>booking</b>, <b>accounts</b> or finding a <b>plumber, mason, electrician</b> and more.'}
+function msg(h,c){const w=document.getElementById('cw');w.insertAdjacentHTML('beforeend',`<div class="m ${c}">${h}</div>`);w.scrollTop=w.scrollHeight}
+function ask(t){const i=document.getElementById('ci');t=t||i.value.trim();if(!t)return;i.value='';msg(esc(t),'u');msg('<span class="animate-pulse">Thinking…</span>','a');setTimeout(()=>{const w=document.getElementById('cw');w.lastChild.remove();msg(reply(t),'a')},700)}
+function tc(){const p=document.getElementById('cp');p.classList.toggle('on');if(p.classList.contains('on')&&!document.getElementById('cw').children.length)msg('Namaste! 🙏 I am BuildBot. I can find workers, explain booking and share rates.','a')}
+document.getElementById('qr').innerHTML=['How to create account?','How to book?','Rates','Find a plumber'].map(q=>`<button class="pill" style="white-space:nowrap" onclick="ask('${q}')">${q}</button>`).join('');
+
+// ---- features, marquee
+document.getElementById('feat').innerHTML=[['🧠','Structural AI','Instant checks on loads, wiring and materials before work starts.'],['🔒','Escrow payments','Money moves only when you approve the finished job.'],['✅','Verified artisans','Every worker is ID and background checked.'],['⚡','Fast matching','Available workers near your site in under four hours.']].map(f=>`<div class="tilt glass rounded-3xl p-7 rv" data-t="14"><div class="text-5xl mb-5 pop fl">${f[0]}</div><h3 class="text-xl font-bold mb-2 pop">${f[1]}</h3><p class="text-sm" style="color:var(--mu)">${f[2]}</p></div>`).join('');
+document.getElementById('mq').innerHTML=[...W,...W].map(w=>`<span>${w[8]} ${w[2]}</span>`).join('');
+
+// ---- tilt, glow, reveal, counters
+function tiltInit(){document.querySelectorAll('.tilt:not([data-i])').forEach(el=>{el.dataset.i=1;const m=+el.dataset.t||10;
+el.addEventListener('mousemove',e=>{const r=el.getBoundingClientRect(),x=(e.clientX-r.left)/r.width,y=(e.clientY-r.top)/r.height;el.style.transform=`perspective(900px) rotateY(${(x-.5)*m}deg) rotateX(${(.5-y)*m}deg) translateY(-6px)`;el.style.setProperty('--mx',x*100+'%');el.style.setProperty('--my',y*100+'%')});
+el.addEventListener('mouseleave',()=>el.style.transform='')})}
+const g=document.getElementById('glow');addEventListener('mousemove',e=>{g.style.left=e.clientX+'px';g.style.top=e.clientY+'px'});
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(!e.isIntersecting)return;const t=e.target;t.classList.add('in');t.querySelectorAll('[data-w]').forEach(b=>b.style.width=b.dataset.w+'%');
+t.querySelectorAll('[data-c]').forEach(c=>{const to=+c.dataset.c,d=+c.dataset.d||0,t0=performance.now();(function f(n){const p=Math.min(1,(n-t0)/1600),v=to*(1-Math.pow(1-p,3));c.textContent=(d?(v/10).toFixed(1):Math.round(v).toLocaleString('en-IN'))+(c.dataset.s||'');if(p<1)requestAnimationFrame(f)})(t0)});io.unobserve(t)}),{threshold:.15});
+function watch(){document.querySelectorAll('.rv').forEach(e=>io.observe(e))}
+
+// ---- 3D city background
+(function(){const c=document.getElementById('bg'),r=new THREE.WebGLRenderer({canvas:c,alpha:true,antialias:true});r.setPixelRatio(Math.min(devicePixelRatio,2));
+const s=new THREE.Scene(),cam=new THREE.PerspectiveCamera(60,1,.1,200);cam.position.set(0,7,17);
+const g=new THREE.Group();g.position.y=-3;s.add(g);
+const m1=new THREE.LineBasicMaterial({color:0xff6a1a,transparent:true,opacity:.55}),m2=new THREE.LineBasicMaterial({color:0x38d6ff,transparent:true,opacity:.35});
+for(let i=-7;i<=7;i++)for(let j=-7;j<=7;j++){if(Math.random()<.4)continue;const h=Math.pow(Math.random(),2)*8+.5,b=new THREE.BoxGeometry(.85,h,.85),e=new THREE.LineSegments(new THREE.EdgesGeometry(b),Math.random()<.2?m2:m1);e.position.set(i*1.7,h/2,j*1.7);g.add(e)}
+const n=600,p=new Float32Array(n*3);for(let i=0;i<n*3;i++)p[i]=(Math.random()-.5)*50;
+const pts=new THREE.Points(new THREE.BufferGeometry().setAttribute('position',new THREE.BufferAttribute(p,3)),new THREE.PointsMaterial({color:0xffb347,size:.07,transparent:true,opacity:.7}));s.add(pts);
+const tk=new THREE.Mesh(new THREE.TorusKnotGeometry(1.7,.45,120,16),new THREE.MeshBasicMaterial({color:0xffb347,wireframe:true,transparent:true,opacity:.28}));tk.position.set(8,5,-4);s.add(tk);
+const ic=new THREE.Mesh(new THREE.IcosahedronGeometry(1.4,1),new THREE.MeshBasicMaterial({color:0x38d6ff,wireframe:true,transparent:true,opacity:.3}));ic.position.set(-9,6,-6);s.add(ic);
+let mx=0,my=0,sy=0;addEventListener('mousemove',e=>{mx=e.clientX/innerWidth-.5;my=e.clientY/innerHeight-.5});addEventListener('scroll',()=>sy=scrollY/Math.max(1,document.body.scrollHeight-innerHeight));
+function rs(){r.setSize(innerWidth,innerHeight,false);cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix()}rs();addEventListener('resize',rs);
+(function a(){requestAnimationFrame(a);g.rotation.y+=.0018;pts.rotation.y-=.0006;tk.rotation.x+=.006;tk.rotation.y+=.009;ic.rotation.x-=.005;ic.rotation.y+=.007;
+cam.position.x+=(mx*6-cam.position.x)*.04;cam.position.y+=(7-my*4-sy*5-cam.position.y)*.04;cam.lookAt(0,1,0);r.render(s,cam)})()})();
+
+pills();draw();nav();est();tiltInit();watch();
+</script>
+<script>
+let CMP=[];
+function draw(){const f=window.F||'All',q=(document.getElementById('q')||{value:''}).value.toLowerCase(),a=fa.value,mp=+fp.value,so=fs.value;
+let L=W.filter(w=>(f==='All'||w[2]===f)&&(w[1]+w[2]+w[10].join()).toLowerCase().includes(q)&&(a==='All'||AR[w[0]-1]===a)&&(!mp||w[7]<=mp)&&(!fv.checked||w[6]==='Available'));
+if(so==='r')L.sort((x,y)=>y[3]-x[3]);if(so==='p')L.sort((x,y)=>x[7]-y[7]);
+document.getElementById('grid').innerHTML=L.length?L.map(w=>{const ok=w[6]==='Available',c=col[w[2]],on=CMP.includes(w[0]);return `<div class="tilt glass rounded-3xl overflow-hidden cursor-pointer" data-t="12" onclick="prof(${w[0]})">
+<div class="h-44 grid place-items-center relative" style="background:radial-gradient(circle at 50% 120%,${c}66,transparent 70%)"><div class="pop fl">${av(w,128)}</div>
+<span class="absolute top-3 left-3 text-xs font-semibold px-3 py-1 rounded-full ${ok?'bg-green-500/20 text-green-300':'bg-red-500/20 text-red-300'}">${w[6]}</span><span class="absolute top-3 right-3 text-xs font-semibold px-3 py-1 rounded-full glass">${fmt(w[7])}/day</span></div>
+<div class="p-5"><div class="flex justify-between items-center"><h3 class="font-bold text-lg">${w[1]}</h3><span class="text-orange-400 text-sm font-bold">★ ${w[3]}</span></div>
+<p class="text-sm mb-1" style="color:${c}">${w[2]} · ${w[4]} yrs</p><p class="text-xs mb-2" style="color:var(--mu)">📍 ${AR[w[0]-1]}, Jaipur</p><p class="text-xs mb-4 line-clamp-2" style="color:var(--mu)">${w[9]}</p>
+<div class="grid grid-cols-2 gap-2"><button class="btn" style="padding:.6rem" ${ok?'':'disabled'} onclick="event.stopPropagation();prof(${w[0]})">${ok?'Hire now':'Currently busy'}</button><button class="pill ${on?'on':''}" onclick="event.stopPropagation();cmp(${w[0]})">${on?'✓ Added':'+ Compare'}</button></div></div></div>`}).join(''):'<p style="color:var(--mu)">No worker matches these filters. Try removing one.</p>';tiltInit()}
+function cmp(id){const i=CMP.indexOf(id);if(i>-1)CMP.splice(i,1);else if(CMP.length<3)CMP.push(id);else return toast('You can compare up to 3 workers',false);cmpUi();draw()}
+function cmpUi(){cb.style.display=CMP.length?'flex':'none';cn.textContent=CMP.length+' selected (max 3)'}
+function showCmp(){if(CMP.length<2)return toast('Select at least 2 workers',false);const L=CMP.map(i=>W.find(w=>w[0]===i)),row=(n,f)=>`<tr><td class="py-2 pr-3" style="color:var(--mu)">${n}</td>${L.map(w=>`<td class="py-2 px-2 font-semibold">${f(w)}</td>`).join('')}</tr>`;
+om(`<div class="p-7"><div class="flex justify-between mb-4"><h3 class="text-2xl font-bold">Compare workers</h3><button onclick="cm()">✕</button></div><div class="overflow-x-auto"><table class="w-full text-sm"><tr><td></td>${L.map(w=>`<td class="px-2 text-center">${av(w,72)}<div class="font-bold">${w[1]}</div></td>`).join('')}</tr>${row('Trade',w=>w[2])}${row('Rate / day',w=>fmt(w[7]))}${row('Rating',w=>'★ '+w[3])}${row('Experience',w=>w[4]+' yrs')}${row('Jobs done',w=>w[5]+'+')}${row('Status',w=>w[6])}${row('Area',w=>AR[w[0]-1])}<tr><td></td>${L.map(w=>`<td class="px-2 pt-3"><button class="btn w-full" style="padding:.5rem" onclick="prof(${w[0]})">Book</button></td>`).join('')}</tr></table></div></div>`)}
+
+// AI job matcher (English + Hinglish keywords)
+const KW={Plumber:'leak pipe tap nal paani water bathroom drain toilet',Electrician:'light wire bijli switch fan short inverter power socket',Painter:'paint rang colour color putai whitewash',Mason:'brick plaster crack floor tile construction deewar cement',Carpenter:'door furniture kitchen wood cupboard almirah darwaza','AC Tech':'ac cooling gas',Welder:'gate grill steel weld',Architect:'design plan naksha vastu map'};
+const hit=(t,k)=>KW[k].split(' ').filter(x=>new RegExp('\\b'+x+'\\b').test(t)).length;
+function mt(){const t=jb.value.toLowerCase().trim();if(!t)return;mo.innerHTML='<p class="animate-pulse text-sm">Analysing your job…</p>';
+setTimeout(()=>{const sc=Object.keys(KW).map(k=>[k,hit(t,k)]).filter(x=>x[1]).sort((a,b)=>b[1]-a[1]).slice(0,2),ur=/today|tomorrow|urgent|asap|\bkal\b|\baaj\b|jaldi/.test(t);
+if(!sc.length){mo.innerHTML='<p class="text-sm" style="color:var(--mu)">I could not tell which trade you need. Try words like leak, wiring, paint, door or AC.</p>';return}
+mo.innerHTML=`<p class="text-sm" style="color:var(--mu)">Best trade${sc.length>1?'s':''}: <b class="text-orange-400">${sc.map(x=>x[0]).join(' / ')}</b>${ur?' · Urgent, showing available workers first':''}</p>`+sc.map(([k])=>{let L=W.filter(w=>w[2]===k);if(ur)L.sort((a,b)=>(b[6]==='Available')-(a[6]==='Available'));const w=L[0];return `<div class="glass rounded-2xl p-4 flex items-center gap-4">${av(w,64)}<div class="flex-1"><b>${w[1]}</b> <span class="text-xs" style="color:var(--mu)">${w[2]} · ★ ${w[3]} · ${w[6]}</span><div class="text-orange-400 font-bold">${fmt(w[7])}/day</div></div><button class="btn" style="padding:.5rem 1rem" onclick="prof(${w[0]})">Book</button></div>`}).join('')},900)}
+
+// Real login with Supabase (email + password)
+function auth(m){const s=m==='signup';om(`<div class="p-8" id="af"><h3 class="text-3xl font-bold mb-1">${s?'Create your ID':'Welcome back'}</h3><p class="mb-6 text-sm" style="color:var(--mu)">${s?'Join the Jaipur marketplace.':'Sign in with your email and password.'}</p><div class="space-y-3">
+${s?'<input id="an" class="inp" placeholder="Full name">':''}<input id="ae" type="email" class="inp" placeholder="Email">
+${s?'<div class="flex gap-2"><span class="inp" style="width:auto">+91</span><input id="ap" class="inp" inputmode="numeric" maxlength="10" placeholder="10-digit mobile number"></div>':''}
+<input id="apw" type="password" class="inp" placeholder="Password (min 6 characters)">
+${s?`<select id="ar" class="inp" onchange="rolePick(this.value)"><option>Customer</option><option>Worker</option><option>Contractor</option></select>
+<div id="aw" style="display:none" class="space-y-3">
+<label class="text-xs" style="color:var(--mu)">Main trade</label><select id="as" class="inp">${W.map(w=>`<option>${w[2]}</option>`).join('')}</select>
+<input id="ax" class="inp" maxlength="200" placeholder="Your skill set, e.g. RCC, plastering, tiles">
+<div class="grid grid-cols-2 gap-3"><input id="ay" type="number" min="0" max="60" class="inp" placeholder="Years of experience"><input id="ad" type="number" min="1" class="inp" placeholder="Daily rate (₹)"></div>
+<label class="text-xs" style="color:var(--mu)">Area you work in</label><select id="aa" class="inp">${AR.map(a=>`<option>${a}</option>`).join('')}</select>
+<textarea id="ab" rows="2" maxlength="300" class="inp" placeholder="About you and your work (short)"></textarea>
+<div id="ac" style="display:none" class="space-y-3"><input id="acn" class="inp" maxlength="80" placeholder="Company or firm name"><input id="at" type="number" min="1" class="inp" placeholder="Team size"></div></div>`:''}
+<button class="btn w-full" onclick="doAuth(${s})">${s?'Create account':'Sign in'}</button>
+<p class="text-center text-sm" style="color:var(--mu)">${s?'Have an ID?':'New here?'} <a class="text-orange-400 cursor-pointer" onclick="auth('${s?'login':'signup'}')">${s?'Sign in':'Create ID'}</a></p></div></div>`)}
+function rolePick(v){document.getElementById('aw').style.display=v==='Customer'?'none':'block';document.getElementById('ac').style.display=v==='Contractor'?'block':'none'}
+async function doAuth(s){const g=i=>(document.getElementById(i)||{}).value||'';const email=g('ae').trim(),pw=g('apw');
+if(!email||!pw)return toast('Enter your email and password',false);
+try{
+if(s){const name=g('an').trim(),ph=g('ap').trim();if(!name)return toast('Enter your name',false);if(!/^\d{10}$/.test(ph))return toast('Enter a valid 10-digit mobile number',false);if(pw.length<6)return toast('Password must be at least 6 characters',false);
+const role=g('ar')||'Customer',meta={name,role,phone:ph};if(role!=='Customer'){const ex=g('ay'),rt=+g('ad');if(ex===''||+ex<0)return toast('Enter your years of experience',false);if(!(rt>0))return toast('Enter your daily rate',false);
+meta.skill=g('as');meta.rate=rt;meta.skills=g('ax').trim();meta.experience_years=+ex;meta.area=g('aa');meta.bio=g('ab').trim();
+if(role==='Contractor'){meta.company=g('acn').trim();meta.team_size=+g('at')||null}}
+const {data,error}=await sb.auth.signUp({email,password:pw,options:{data:meta}});if(error)throw error;
+if(!data.session){cm();return toast('Account created. Confirm your email, then sign in.')}}
+else{const {error}=await sb.auth.signInWithPassword({email,password:pw});if(error)throw error}
+await loadUser();cm();toast('Welcome, '+(U?U.name:'')+'!')
+}catch(e){toast(e.message||'Something went wrong',false)}}
+async function loadUser(){const {data:{session}}=await sb.auth.getSession();
+if(!session){U=null;nav();draw();return}
+const uid=session.user.id;
+const [p,b]=await Promise.all([sb.from('profiles').select('*').eq('id',uid).single(),sb.from('bookings').select('*').eq('customer_id',uid).order('created_at',{ascending:false})]);
+if(p.error){U=null;nav();draw();return toast('Could not load your profile',false)}
+U={...p.data,bookings:(b.data||[]).map(x=>({id:x.booking_code,w:x.worker_name,s:x.skill,d:x.booking_date,n:x.days,a:x.address,t:x.total,st:x.status||0}))};nav();draw()}
+async function logout(){await sb.auth.signOut();U=null;nav();draw();toast('Logged out')}
+async function setAvail(){const v=!U.avail;const {error}=await sb.from('profiles').update({avail:v}).eq('id',U.id);if(error)return toast(error.message,false);U.avail=v;dash()}
+async function stp(id){const b=U.bookings.find(x=>x.id===id);const v=(b.st||0)+1;const {error}=await sb.from('bookings').update({status:v}).eq('booking_code',id).eq('customer_id',U.id);if(error)return toast(error.message,false);b.st=v;dash();toast(ST[v])}
+
+// Voice + Hinglish chat
+function mic(){const R=window.SpeechRecognition||window.webkitSpeechRecognition;if(!R)return toast('Voice input is not supported in this browser',false);const r=new R();r.lang=LG==='hi'?'hi-IN':'en-IN';r.onresult=e=>ask(e.results[0][0].transcript);r.onerror=()=>toast('Could not hear you. Try again',false);r.start();toast('Listening…')}
+QA.unshift([['kaise','madad','kya karun'],'Main aapki madad kar sakta hoon: <b>rates</b>, <b>booking</b>, <b>account</b> ya koi <b>kaarigar</b> dhundhna. Likhiye ya 🎤 dabaiye.']);
+const _rp=reply;reply=function(m){const l=m.toLowerCase();const k=Object.keys(KW).find(k=>hit(l,k));if(k&&!/plumber|mason|electrician|carpenter|painter|architect|welder/.test(l)){const w=W.find(x=>x[2]===k&&x[6]==='Available')||W.find(x=>x[2]===k);return `${av(w,36)}<br><b>${w[1]}</b> (${w[2]}) · ★ ${w[3]} · ${fmt(w[7])}/day · ${w[6]}<br><a class="text-orange-400 cursor-pointer" onclick="prof(${w[0]})">Open profile</a>`}return _rp(m)};
+let TT;new MutationObserver(()=>{clearTimeout(TT);TT=setTimeout(tr,30)}).observe(document.body,{childList:true,subtree:true});
+LG=S.get('lang')||'en';draw();est();nav();tr();loadUser();
+</script>
+</body>
+</html>
